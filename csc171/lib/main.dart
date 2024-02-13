@@ -30,6 +30,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int navBarIndex = 0;
+  var _strHome = [
+    "Home page! Yippie!",
+    "Navigating towards Jobs",
+    "Going to your profile"
+  ];
+
+  var questions = [
+    // list of text which the text get form here
+    "Priyanshu is a developer",
+    "You can also become the gfg developer",
+  ];
+
+  void _navClicked(int index) {
+    setState(() {
+      navBarIndex = index;
+    });
+    print("navbar " + navBarIndex.toString() + " clicked!");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,19 +57,27 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
+              _strHome[navBarIndex],
+              style: const TextStyle(
+                color: Colors.pink,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Text(
               "Welcome to",
               style: TextStyle(
                 fontSize: 32.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Image(image: AssetImage('./assets/images/MainScreenLogo.png')),
-            Text(
+            const Image(
+                image: AssetImage('./assets/images/MainScreenLogo.png')),
+            const Text(
               "Information Guide",
               style: TextStyle(
                 fontSize: 32.0,
@@ -75,6 +103,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Profile',
           ),
         ],
+        currentIndex: navBarIndex,
+        onTap: _navClicked,
       ),
     );
   }

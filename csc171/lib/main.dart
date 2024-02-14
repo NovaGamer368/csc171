@@ -11,10 +11,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'FFXIV Info Assistant',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-        useMaterial3: true,
-      ),
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData.dark().copyWith(
+          colorScheme: const ColorScheme.dark(
+        primary: Colors.grey,
+        secondary: Color(0xFFD50000),
+      )),
+      // theme: ThemeData(
+      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
+      //   useMaterial3: true,
+      // ),
       home: const MyHomePage(title: 'FFXIV Info Assistant Home Page'),
     );
   }
@@ -31,23 +37,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int navBarIndex = 0;
-  var _strHome = [
+  final _strHome = [
     "Home page! Yippie!",
     "Navigating towards Jobs",
     "Going to your profile"
-  ];
-
-  var questions = [
-    // list of text which the text get form here
-    "Priyanshu is a developer",
-    "You can also become the gfg developer",
   ];
 
   void _navClicked(int index) {
     setState(() {
       navBarIndex = index;
     });
-    print("navbar " + navBarIndex.toString() + " clicked!");
   }
 
   @override
@@ -64,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               _strHome[navBarIndex],
               style: const TextStyle(
-                color: Colors.pink,
+                color: Color(0xFFD50000),
                 fontWeight: FontWeight.bold,
               ),
             ),

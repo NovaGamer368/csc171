@@ -17,75 +17,38 @@ class MyApp extends StatelessWidget {
         primary: Colors.grey,
         secondary: Color(0xFFD50000),
       )),
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-      //   useMaterial3: true,
-      // ),
-      home: const MyHomePage(title: 'FFXIV Info Assistant Home Page'),
+      home: const MyNavigator(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+/////////////////////////////////////////////////////////Useful widgets
+///
+class MyNavigator extends StatefulWidget {
+  const MyNavigator({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyNavigator> createState() => _MyNavigatorState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int navBarIndex = 0;
-  final _strHome = [
-    "Home page! Yippie!",
-    "Navigating towards Jobs",
-    "Going to your profile"
-  ];
-
-  void _navClicked(int index) {
+class _MyNavigatorState extends State<MyNavigator> {
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    // print(index);
     setState(() {
-      navBarIndex = index;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _strHome[navBarIndex],
-              style: const TextStyle(
-                color: Color(0xFFD50000),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              "Welcome to",
-              style: TextStyle(
-                fontSize: 32.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Image(
-                image: AssetImage('./assets/images/MainScreenLogo.png')),
-            const Text(
-              "Information Guide",
-              style: TextStyle(
-                fontSize: 32.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
+      //List of pages that I want to load
+      body: IndexedStack(index: _selectedIndex, children: <Widget>[
+        const MyHomePage(title: 'FFXIV Info Assistant Home Page'), //Home page
+        JobsPage(title: 'Jobs Page'), //Jobs page
+        const ProfilePage(),
+      ]),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         items: const <BottomNavigationBarItem>[
@@ -102,8 +65,160 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Profile',
           ),
         ],
-        currentIndex: navBarIndex,
-        onTap: _navClicked,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+////////////////    ////////////////
+////////////////Home////////////////
+////////////////    ////////////////
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "Welcome to",
+              style: TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Image(image: AssetImage('./assets/images/MainScreenLogo.png')),
+            Text(
+              "Information Guide",
+              style: TextStyle(
+                fontSize: 32.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+////////////////    ////////////////
+////////////////Jobs////////////////
+////////////////    ////////////////
+
+class JobsPage extends StatefulWidget {
+  JobsPage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  State<JobsPage> createState() => _JobsPageState();
+}
+
+class _JobsPageState extends State<JobsPage> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+          child: Column(
+        children: [
+          const Text(
+            "Job list...",
+            style: TextStyle(
+              fontSize: 32.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Search bar',
+                alignLabelWithHint: true,
+                contentPadding: EdgeInsets.symmetric(horizontal: 20.0),
+              ),
+              textAlign: TextAlign.center,
+              onSubmitted: (String value) async {
+                await showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Thanks!'),
+                      content: Text('You searched for "$value"'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }),
+        ],
+      )),
+    );
+  }
+}
+
+////////////////       ////////////////
+////////////////Profile////////////////
+////////////////       ////////////////
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text('Profile Page'),
+      ),
+      body: const Center(
+        child: Text(
+          'Profile Page Content',
+          style: TextStyle(
+            fontSize: 32.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }

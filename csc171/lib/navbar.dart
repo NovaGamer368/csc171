@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import './jobs.dart';
+import 'jobs/jobs.dart';
 import './profile.dart';
 import './home.dart';
 

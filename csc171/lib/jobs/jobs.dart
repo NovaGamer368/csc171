@@ -1,3 +1,4 @@
+import 'package:csc171/jobs/jobList.dart';
 import 'package:flutter/material.dart';
 
 class JobsPage extends StatefulWidget {
@@ -69,6 +70,9 @@ class _JobsPageState extends State<JobsPage> {
                   },
                 );
               }),
+          Expanded(
+            child: JobList(),
+          )
         ],
       )),
     );

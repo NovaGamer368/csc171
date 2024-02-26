@@ -1,10 +1,10 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class JobList extends StatefulWidget {
+  const JobList({super.key});
+
   @override
   _JobListState createState() => _JobListState();
 }
@@ -17,7 +17,13 @@ class _JobListState extends State<JobList> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['Results'] is List) {
-          return jsonResponse['Results'];
+          List<Future<Object>> apiJobs = [];
+          for (var jobObject in jsonResponse['Results']) {
+            apiJobs.add(getJobDetails(jobObject));
+          }
+          List<dynamic> resolvedJobs = await Future.wait(apiJobs);
+          // print(resolvedJobs);
+          return resolvedJobs;
         }
         throw Exception('Unexpected response format');
       } else {
@@ -31,19 +37,15 @@ class _JobListState extends State<JobList> {
 
   Future<Object> getJobDetails(jobObject) async {
     try {
-      final url = Uri.parse('http://xivapi.com/ClassJob/${jobObject.ID}');
+      print('CALLING OBJECT');
+      print(jobObject);
+      final url = Uri.parse('http://xivapi.com${jobObject['Url']}');
       var response = await http.get(url);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('2nd call');
-        print(jsonResponse);
-      }
-      if (response.statusCode == 200) {
-        // final jsonResponse = jsonDecode(response.body);
-        // if (jsonResponse['Results'] is List) {
-        //   return jsonResponse['Results'];
-        // }
-        throw Exception('Unexpected response format');
+        return jsonResponse;
+      } else if (response.statusCode == 429) {
+        return {};
       } else {
         throw Exception('Failed to load job list: ${response.statusCode}');
       }
@@ -68,18 +70,15 @@ class _JobListState extends State<JobList> {
             child: Text('Error: ${snapshot.error}'),
           );
         } else {
-          print(snapshot.data);
-          return Expanded(
-            child: ListView.builder(
-              itemCount: snapshot.data?.length ?? 0,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(snapshot.data?[index]['Name'] ?? 'No Name'),
-                  subtitle:
-                      Text(snapshot.data?[index]['ID'].toString() ?? 'No ID'),
-                );
-              },
-            ),
+          return ListView.builder(
+            itemCount: snapshot.data?.length ?? 0,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(snapshot.data?[index]['Name'] ?? 'No Name'),
+                subtitle: Text(
+                    snapshot.data?[index]['Abbreviation'] ?? 'No Abbreviation'),
+              );
+            },
           );
         }
       },

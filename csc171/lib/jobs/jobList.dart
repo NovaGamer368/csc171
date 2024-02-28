@@ -134,6 +134,8 @@ class _JobListState extends State<JobList> {
             children: [
               Text('Abbreviation: ${jobDetails['Abbreviation']}'),
               Text('Job Category: ${jobDetails['ClassJobCategory']['Name']}'),
+              Text(
+                  'Description of Jobstone: ${jobDetails['ItemSoulCrystal']['Description']}'),
               // Add more job details here as needed
             ],
           ),

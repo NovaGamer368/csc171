@@ -6,7 +6,7 @@ class JobList extends StatefulWidget {
   const JobList({super.key});
 
   @override
-  _JobListState createState() => _JobListState();
+  State<JobList> createState() => _JobListState();
 }
 
 class _JobListState extends State<JobList> {
@@ -17,6 +17,7 @@ class _JobListState extends State<JobList> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['Results'] is List) {
+          print(jsonResponse['Results']);
           List<Future<Object>> apiJobs = [];
           for (var jobObject in jsonResponse['Results']) {
             if (jobObject['ID'] >= 19 &&
@@ -86,7 +87,8 @@ class _JobListState extends State<JobList> {
                 },
                 child: Card(
                   elevation: 3,
-                  color: Theme.of(context).primaryColor,
+                  borderOnForeground: true,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -96,19 +98,24 @@ class _JobListState extends State<JobList> {
                           snapshot.data![index]['Name'] ?? "No Name",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'ID: ${snapshot.data![index]['ID']}',
-                          style: const TextStyle(color: Colors.white),
                         ),
                         const SizedBox(height: 8),
                         Image.network(
                           'http://xivapi.com/cj/companion/${imageUrl.replaceAll(' ', '')}.png',
                           width: 100,
                           height: 100,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.error_outline,
+                              color: Colors.red,
+                              size: 50,
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -144,7 +151,7 @@ class _JobListState extends State<JobList> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );

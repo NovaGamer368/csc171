@@ -70,7 +70,7 @@ class _JobsPageState extends State<JobsPage> {
                   },
                 );
               }),
-          Expanded(
+          const Expanded(
             child: JobList(),
           )
         ],

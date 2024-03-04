@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:isar/isar.dart';
+import 'isarModels/userProfile.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,8 +15,42 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late bool isDarkMode = true;
+  late Isar isar;
   late File _image = File('');
   bool _imageLoading = false;
+
+  void initState() {
+    super.initState();
+    initIsar();
+  }
+
+  Future<void> initIsar() async {
+    final dir = await getApplicationDocumentsDirectory();
+
+    isar = await Isar.open(
+      [UserProfileSchema],
+      directory: dir.path,
+    );
+    print(isar);
+    final userProfileList = await isar.userProfiles.where().findAll();
+    if (userProfileList.isNotEmpty) {
+      userProfileList.sort((a, b) => b.id.compareTo(a.id));
+      final userProfile = userProfileList.first;
+
+      setState(() {
+        _image = File(userProfile.imagePath);
+      });
+    }
+
+    getDarkMode();
+  }
+
+  Future<void> saveImagePathToIsar(String imagePath) async {
+    final userProfile = UserProfile()..imagePath = imagePath;
+    await isar.writeTxn(() async {
+      await isar.userProfiles.put(userProfile);
+    });
+  }
 
   Future<void> _getImage(ImageSource source) async {
     setState(() {
@@ -26,6 +63,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _imageLoading = false;
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+        saveImagePathToIsar(_image.path);
       } else {
         print('No image selected.');
       }
@@ -49,7 +87,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    getDarkMode();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -91,7 +128,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   : CircleAvatar(
                       radius: 50,
                       backgroundImage:
-                          _image != null ? FileImage(_image!) : null,
+                          // ignore: unnecessary_null_comparison
+                          _image != null ? FileImage(_image) : null,
+                      // ignore: unnecessary_null_comparison
                       child: _image == null
                           ? const Icon(
                               Icons.person,

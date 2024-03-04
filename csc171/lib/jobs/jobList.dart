@@ -17,7 +17,7 @@ class _JobListState extends State<JobList> {
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         if (jsonResponse['Results'] is List) {
-          print(jsonResponse['Results']);
+          // print(jsonResponse['Results']);
           List<Future<Object>> apiJobs = [];
           for (var jobObject in jsonResponse['Results']) {
             if (jobObject['ID'] >= 19 &&
